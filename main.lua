@@ -1,32 +1,9 @@
-local deck = {}
+local Deck = require("lib/deck")
+local deck = nil
 local playerHand = {}
 local dealerHand = {}
 local roundOver = false
-local function buildDeck()
-	d = {}
-	for _, suit in ipairs({ "club", "heart", "spade", "diamond" }) do
-		for rank = 1, 13 do
-			table.insert(d, { suit = suit, rank = rank })
-		end
-	end
-	return d
-end
-
-local function shuffle()
-	for i = #deck, 2, -1 do
-		local j = love.math.random(i)
-		deck[i], deck[j] = deck[j], deck[i]
-	end
-end
-
-local function drawCards(deck, hand, amount)
-	for i = 1, amount do
-		if #deck == 0 then
-			break
-		end
-		table.insert(hand, table.remove(deck))
-	end
-end
+local images = {}
 
 local function getTotal(hand)
 	local total = 0
@@ -44,12 +21,48 @@ local function getTotal(hand)
 	end
 	return total
 end
+local function loadImages()
+	local img = {}
+	for _, name in ipairs({
+		1,
+		2,
+		3,
+		4,
+		5,
+		6,
+		7,
+		8,
+		9,
+		10,
+		11,
+		12,
+		13,
+		"pip_heart",
+		"pip_diamond",
+		"pip_club",
+		"pip_spade",
+		"mini_heart",
+		"mini_diamond",
+		"mini_club",
+		"mini_spade",
+		"card",
+		"card_face_down",
+		"face_jack",
+		"face_queen",
+		"face_king",
+	}) do
+		img[name] = love.graphics.newImage("images/" .. name .. ".png")
+	end
+	return img
+end
 --Love Load Function
 function love.load()
-	deck = buildDeck()
-	shuffle(deck)
-	drawCards(deck, playerHand, 2)
-	drawCards(deck, dealerHand, 2)
+	images = loadImages()
+	deck = Deck()
+	deck.build()
+	deck.shuffle()
+	deck.draw(playerHand, 2)
+	deck.draw(dealerHand, 2)
 end
 -- Love Draw Function
 function love.draw()
@@ -72,8 +85,8 @@ end
 -- Love Keypressed Function
 function love.keypressed(key)
 	if key == "h" then
-		if #deck > 0 then
-			drawCards(deck, playerHand, 1)
+		if deck.size() > 0 then
+			deck.draw(playerHand, 1)
 		end
 	elseif key == "s" then
 		roundOver = true
