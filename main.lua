@@ -55,6 +55,7 @@ local function loadImages()
 	end
 	return img
 end
+
 --Love Load Function
 function love.load()
 	images = loadImages()
@@ -64,6 +65,7 @@ function love.load()
 	deck.draw(playerHand, 2)
 	deck.draw(dealerHand, 2)
 end
+
 -- Love Draw Function
 function love.draw()
 	local output = {}
@@ -79,14 +81,33 @@ function love.draw()
 		table.insert(output, "suit: " .. card.suit .. ", rank: " .. card.rank)
 	end
 	table.insert(output, "Total: " .. getTotal(dealerHand))
+	table.insert(output, "")
+	if roundOver then
+		if getTotal(playerHand) <= 21 
+		and (getTotal(dealerHand) > 21 
+		or getTotal(playerHand) > getTotal(dealerHand)) then
+			table.insert(output, "Player win!")
+		elseif getTotal(dealerHand) <= 21 
+		and (getTotal(playerHand) > 21 
+		or getTotal(playerHand) < getTotal(dealerHand)) then
+			table.insert(output, "Dealer win!")
+		else
+			table.insert(output, "It's a tie!")
+		end
+	else
+		table.insert(output, "Press 'h' to hit or 's' to stand.")
+	end
 
 	love.graphics.print(table.concat(output, "\n"), 15, 15)
 end
+
 -- Love Keypressed Function
 function love.keypressed(key)
 	if key == "h" then
-		if deck.size() > 0 then
-			deck.draw(playerHand, 1)
+		if deck ~= nil then
+			if deck.size() > 0 then
+				deck.draw(playerHand, 1)
+			end
 		end
 	elseif key == "s" then
 		roundOver = true
