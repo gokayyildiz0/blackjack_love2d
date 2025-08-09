@@ -32,11 +32,16 @@ local function Deck(initialContents)
 	local function size()
 		return #self.contents
 	end
+	local function reset()
+		self.contents = {}
+		build()
+	end
 
 	return {
 		build = build,
 		shuffle = shuffle,
 		draw = draw,
+		reset = reset,
 		size = size,
 		getContents = function()
 			return self.contents
