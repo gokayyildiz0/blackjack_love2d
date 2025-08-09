@@ -1,6 +1,3 @@
-# Created by https://www.toptal.com/developers/gitignore/api/macos,vim,lua,windows,linux
-# Edit at https://www.toptal.com/developers/gitignore?templates=macos,vim,lua,windows,linux
-
 ### Linux ###
 *~
 
@@ -16,7 +13,6 @@
 # .nfs files are created when an open file is removed but is still being accessed
 .nfs*
 
-.vscode/
 ### Lua ###
 # Compiled Lua sources
 luac.out
@@ -139,4 +135,5 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-# End of https://www.toptal.com/developers/gitignore/api/macos,vim,lua,windows,linux
+### Visual Studio Code ###
+.vscode/
