@@ -89,7 +89,9 @@ end
 local function dealerPlay()
 	while getTotal(dealerHand) < 17 do
 		if deck ~= nil then
-			deck.draw(dealerHand, 1)
+			if deck ~= nil then
+				deck.draw(dealerHand, 1)
+			end
 		end
 	end
 end
@@ -99,8 +101,74 @@ function love.load()
 	love.window.setTitle("Blackjack Game")
 	love.graphics.setBackgroundColor(1, 1, 1)
 	love.math.setRandomSeed(os.time())
+
+	local buttonY = 230
+	local buttonHeight = 25
+	local textOffsetY = 6
+
+	ButtonHit = {
+		x = 10,
+		y = buttonY,
+		width = 53,
+		height = buttonHeight,
+		text = 'Hit!',
+		textOffsetX = 16,
+		textOffsetY = textOffsetY,
+	}
+
+	ButtonStand = {
+		x = 70,
+		y = buttonY,
+		width = 53,
+		height = buttonHeight,
+		text = 'Stand',
+		textOffsetX = 8,
+		textOffsetY = textOffsetY,
+	}
+
+	ButtonPlayAgain = {
+		x = 10,
+		y = buttonY,
+		width = 113,
+		height = buttonHeight,
+		text = 'Play again',
+		textOffsetX = 24,
+		textOffsetY = textOffsetY,
+	}
+	function IsMouseInButton(button)
+		return love.mouse.getX() >= button.x
+			and love.mouse.getX() < button.x + button.width
+			and love.mouse.getY() >= button.y
+			and love.mouse.getY() < button.y + button.height
+	end
+
 	images = loadImages()
 	resetGame()
+end
+
+function love.mousereleased()
+    if not roundOver then
+        if IsMouseInButton(ButtonHit) then
+			if deck ~= nil then
+				deck.draw(playerHand, 1)
+			end
+            if getTotal(playerHand) >= 21 then
+                roundOver = true
+            end
+        elseif IsMouseInButton(ButtonStand) then
+            roundOver = true
+        end
+
+        if roundOver then
+			while getTotal(dealerHand) < 17 do
+				if deck ~= nil then
+					deck.draw(dealerHand, 1)
+				end
+			end
+        end
+    elseif IsMouseInButton(ButtonPlayAgain) then
+        resetGame()
+    end
 end
 
 -- Love Draw Function
@@ -115,11 +183,6 @@ function love.draw()
 	local yMid = 31
 	local cardSpacing = 60
 	local marginX = 10
-
-
-
-
-
 	local function drawCard(card, x, y)
 		love.graphics.setColor(1, 1, 1)
 		love.graphics.draw(images.card, x, y)
@@ -236,9 +299,6 @@ function love.draw()
 			end
 		end
 	end
-
-
-
 	for cardIndex, card in ipairs(dealerHand) do
 		local dealerMarginY = 30
 		if not roundOver and cardIndex == 1 then
@@ -248,48 +308,40 @@ function love.draw()
 			drawCard(card, ((cardIndex - 1) * cardSpacing) + marginX, dealerMarginY)
 		end
 	end
-
 	for cardIndex, card in ipairs(playerHand) do
 		drawCard(card, ((cardIndex - 1) * cardSpacing) + marginX, 140)
 	end
-
 	love.graphics.setColor(0, 0, 0)
-
 	if roundOver then
 		love.graphics.print('Total: ' .. getTotal(dealerHand), marginX, 10)
 	else
 		love.graphics.print('Total: ?', marginX, 10)
 	end
-
 	love.graphics.print('Total: ' .. getTotal(playerHand), marginX, 120)
 
+	local function drawButton(button)
+	
+
+		if IsMouseInButton(button) then
+			love.graphics.setColor(1, .8, .3)
+		else
+			love.graphics.setColor(1, .5, .2)
+		end
+		love.graphics.rectangle('fill', button.x, button.y, button.width, button.height)
+		love.graphics.setColor(1, 1, 1)
+		love.graphics.print(button.text, button.x + button.textOffsetX, button.y + 6)
+	end
 	if roundOver then
 		local resultMessage = endRound()
+		drawButton(ButtonPlayAgain)
+		love.graphics.setColor(0, 0, 0)
+		love.graphics.print(resultMessage, marginX, 270)
 
-		love.graphics.print(resultMessage, marginX, 268)
-		love.graphics.print("Press any key to reset the game.", marginX, 298)
 		return
+	else
+		drawButton(ButtonHit)
+		drawButton(ButtonStand)
 	end
-	local function drawButton(text, buttonX, buttonWidth, textOffsetX)
-        local buttonY = 230
-        local buttonHeight = 25
-
-        if love.mouse.getX() >= buttonX
-        and love.mouse.getX() < buttonX + buttonWidth
-        and love.mouse.getY() >= buttonY
-        and love.mouse.getY() < buttonY + buttonHeight then
-            love.graphics.setColor(1, .8, .3)
-        else
-            love.graphics.setColor(1, .5, .2)
-        end
-        love.graphics.rectangle('fill', buttonX, buttonY, buttonWidth, buttonHeight)
-        love.graphics.setColor(1, 1, 1)
-        love.graphics.print(text, buttonX + textOffsetX, buttonY + 6)
-    end
-
-	drawButton('Hit!', 10, 53, 16)
-	drawButton('Stand', 70, 53, 8)
-	-- drawButton('Play again', 10, 113, 24)
 end
 
 -- Love Keypressed Function
