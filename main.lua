@@ -118,7 +118,7 @@ function love.draw()
 
 
 
-	
+
 
 	local function drawCard(card, x, y)
 		love.graphics.setColor(1, 1, 1)
@@ -270,6 +270,26 @@ function love.draw()
 		love.graphics.print("Press any key to reset the game.", marginX, 298)
 		return
 	end
+	local function drawButton(text, buttonX, buttonWidth, textOffsetX)
+        local buttonY = 230
+        local buttonHeight = 25
+
+        if love.mouse.getX() >= buttonX
+        and love.mouse.getX() < buttonX + buttonWidth
+        and love.mouse.getY() >= buttonY
+        and love.mouse.getY() < buttonY + buttonHeight then
+            love.graphics.setColor(1, .8, .3)
+        else
+            love.graphics.setColor(1, .5, .2)
+        end
+        love.graphics.rectangle('fill', buttonX, buttonY, buttonWidth, buttonHeight)
+        love.graphics.setColor(1, 1, 1)
+        love.graphics.print(text, buttonX + textOffsetX, buttonY + 6)
+    end
+
+	drawButton('Hit!', 10, 53, 16)
+	drawButton('Stand', 70, 53, 8)
+	-- drawButton('Play again', 10, 113, 24)
 end
 
 -- Love Keypressed Function
