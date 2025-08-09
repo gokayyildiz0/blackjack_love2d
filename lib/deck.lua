@@ -4,14 +4,14 @@ local function Deck(initialContents)
 	}
 
 	local function build()
-		if #self.contents == 0 then
+			self.contents = {}
 			for _, suit in ipairs({ "club", "heart", "spade", "diamond" }) do
 				for rank = 1, 13 do
 					table.insert(self.contents, { suit = suit, rank = rank })
 				end
 			end
 		end
-	end
+	
 
 	local function shuffle()
 		for i = #self.contents, 2, -1 do
@@ -32,16 +32,12 @@ local function Deck(initialContents)
 	local function size()
 		return #self.contents
 	end
-	local function reset()
-		self.contents = {}
-		build()
-	end
+	
 
 	return {
 		build = build,
 		shuffle = shuffle,
 		draw = draw,
-		reset = reset,
 		size = size,
 		getContents = function()
 			return self.contents
