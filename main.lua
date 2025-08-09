@@ -6,18 +6,22 @@ local roundOver = false
 local images = {}
 
 local function getTotal(hand)
-	local total = 0
-	local hasAce = false
-
+	local total, aces = 0, 0
 	for _, card in ipairs(hand) do
-		if card.rank > 10 then
-			total = total + 10
+		local r = card.rank
+		if r == 1 then
+			aces = aces + 1 -- count Aces first
+			total = total + 1
+		elseif r >= 11 then
+			total = total + 10 -- J,Q,K
 		else
-			total = total + card.rank
+			total = total + r
 		end
 	end
-	if hasAce and total <= 11 then
+	-- promote as many aces to 11 as possible
+	while aces > 0 and total <= 11 do
 		total = total + 10
+		aces = aces - 1
 	end
 	return total
 end
@@ -56,42 +60,48 @@ local function loadImages()
 	return img
 end
 local function endRound()
-	local function hasHandWon(hand1, hand2)
-	return getTotal(hand1) <= 21 
-		and (getTotal(hand2) > 21 
-		or getTotal(hand1) > getTotal(hand2))
-	end
+	local p = getTotal(playerHand)
+	local d = getTotal(dealerHand)
 
-	if hasHandWon(playerHand, dealerHand) then
-		return("Player wins!")
-	elseif hasHandWon(dealerHand, playerHand) then
-		return("Dealer wins!")
+	if p > 21 and d > 21 then
+		return "Both bust! Dealer wins by house rules."
+	elseif p > 21 then
+		return "Dealer wins!"
+	elseif d > 21 then
+		return "Player wins!"
+	elseif p > d then
+		return "Player wins!"
+	elseif d > p then
+		return "Dealer wins!"
 	else
-		return("It's a tie!")
+		return "It's a tie!"
 	end
 end
 local function resetGame()
-	playerHand = {}
-	dealerHand = {}
+	playerHand, dealerHand = {}, {}
 	roundOver = false
-	if deck then
-		deck.build()
-		deck.shuffle()	
-		deck.draw(playerHand, 2)
-	deck.draw(dealerHand, 2)
-	end
-	
-end
-
---Love Load Function
-function love.load()
-	images = loadImages()
-	deck = Deck()
+	deck = Deck() -- fresh object prevents duplication
 	deck.build()
 	deck.shuffle()
 	deck.draw(playerHand, 2)
 	deck.draw(dealerHand, 2)
+end
 
+local function dealerPlay()
+	-- Dealer hits to 17 (change to <=16 if you prefer)
+	while getTotal(dealerHand) < 17 do
+		if deck ~= nil then
+			deck.draw(dealerHand, 1)
+		end
+	end
+end
+
+--Love Load Function
+function love.load()
+	love.window.setTitle("Blackjack Game")
+  love.math.setRandomSeed(os.time())
+  images = loadImages()
+  resetGame()
 end
 
 -- Love Draw Function
@@ -121,17 +131,21 @@ end
 
 -- Love Keypressed Function
 function love.keypressed(key)
-	if not roundOver then
-	if key == "h" then
+	if roundOver then
+		resetGame()
+		return
+	end
+	if key == 'h' then
 		if deck ~= nil then
-			if deck.size() > 0 then
-				deck.draw(playerHand, 1)
-			end
+			deck.draw(playerHand, 1)
 		end
-	elseif key == "s" then
+		local p = getTotal(playerHand)
+		if p > 21 then
+			-- player busts: end round immediately, no dealer draw
+			roundOver = true
+		end
+	elseif key == 's' then
+		dealerPlay()
 		roundOver = true
 	end
-else
-	resetGame()
-end
 end
