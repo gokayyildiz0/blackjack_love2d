@@ -137,3 +137,6 @@ $RECYCLE.BIN/
 
 ### Visual Studio Code ###
 .vscode/
+
+## Dist
+dist/
