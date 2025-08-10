@@ -9,8 +9,6 @@ I started this project by following Berbasoft's Blackjack tutorial as a base, th
 ### Improvements over the original tutorial
 
 - **Modular structure**: Separated into `state`, `rules`, `render`, `input`, and `deck` modules for maintainability.
-- **UI Buttons**: Mouse-driven Hit, Stand, and Play Again buttons, with hover effects.
-- **Keyboard Support**: Press `H` to hit, `S` to stand, and any key to restart after a round.
 - **Dealer Logic**: Configurable to hit on soft 17.
 - **Encapsulated Deck Logic**: Self-contained `Deck` module with shuffle, draw, and reset functions.
 - **Better Ace Handling**: Proper soft/hard Ace value calculation.
